@@ -573,9 +573,20 @@ class CPU : public BaseCPU
         return iew.ldstQueue.getDataPort();
     }
 
+    Port &
+    getDataPortB1() override
+    {
+        return iew.ldstQueue.getDataPortB1();
+    }
+
     struct CPUStats : public statistics::Group
     {
         CPUStats(CPU *cpu);
+
+	/** Stat for avg ROB Occupancy */
+        statistics::Average avgROBOccupancy;
+        /** Stat for max ROB Occupancy */
+        statistics::Scalar maxROBOccupancy;
 
         /** Stat for total number of times the CPU is descheduled. */
         statistics::Scalar timesIdled;

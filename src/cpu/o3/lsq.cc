@@ -83,6 +83,7 @@ LSQ::LSQ(CPU *cpu_ptr, IEW *iew_ptr, const BaseO3CPUParams &params)
       maxSQEntries(maxLSQAllocation(lsqPolicy, SQEntries, params.numThreads,
                   params.smtLSQThreshold)),
       dcachePort(this, cpu_ptr),
+      dcachePort_b1(this, cpu_ptr),
       numThreads(params.numThreads)
 {
     assert(numThreads > 0 && numThreads <= MaxThreads);
@@ -116,6 +117,7 @@ LSQ::LSQ(CPU *cpu_ptr, IEW *iew_ptr, const BaseO3CPUParams &params)
         thread.emplace_back(maxLQEntries, maxSQEntries);
         thread[tid].init(cpu, iew_ptr, params, this, tid);
         thread[tid].setDcachePort(&dcachePort);
+        thread[tid].setDcachePortB1(&dcachePort_b1);
     }
 }
 
@@ -1323,8 +1325,27 @@ void
 LSQ::SingleDataRequest::sendPacketToCache()
 {
     assert(_numOutstandingPackets == 0);
-    if (lsqUnit()->trySendPacket(isLoad(), _packets.at(0)))
+    if (lsqUnit()->trySendPacket(isLoad(), _packets.at(0), false))
         _numOutstandingPackets = 1;
+}
+
+void
+LSQ::SingleDataRequest::sendPacketToB1Cache()
+{
+    assert(_numOutstandingPackets == 0);
+    if (lsqUnit()->trySendPacket(isLoad(), _packets.at(0), true))
+        _numOutstandingPackets = 1;
+}
+
+void
+LSQ::SplitDataRequest::sendPacketToB1Cache()
+{
+    /* Try to send the packets. */
+    while (numReceivedPackets + _numOutstandingPackets < _packets.size() &&
+            lsqUnit()->trySendPacket(isLoad(),
+                _packets.at(numReceivedPackets + _numOutstandingPackets), true)) {
+        _numOutstandingPackets++;
+    }
 }
 
 void
@@ -1333,7 +1354,7 @@ LSQ::SplitDataRequest::sendPacketToCache()
     /* Try to send the packets. */
     while (numReceivedPackets + _numOutstandingPackets < _packets.size() &&
             lsqUnit()->trySendPacket(isLoad(),
-                _packets.at(numReceivedPackets + _numOutstandingPackets))) {
+                _packets.at(numReceivedPackets + _numOutstandingPackets), false)) {
         _numOutstandingPackets++;
     }
 }

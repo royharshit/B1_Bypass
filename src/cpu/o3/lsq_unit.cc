@@ -284,6 +284,12 @@ LSQUnit::setDcachePort(RequestPort *dcache_port)
 }
 
 void
+LSQUnit::setDcachePortB1(RequestPort *dcache_port)
+{
+    dcachePort_b1 = dcache_port;
+}
+
+void
 LSQUnit::drainSanityCheck() const
 {
     for (int i = 0; i < loadQueue.capacity(); ++i)
@@ -1196,19 +1202,27 @@ LSQUnit::completeStore(typename StoreQueue::iterator store_idx)
 }
 
 bool
-LSQUnit::trySendPacket(bool isLoad, PacketPtr data_pkt)
+LSQUnit::trySendPacket(bool isLoad, PacketPtr data_pkt, bool prefetch)
 {
-    bool ret = true;
+
     bool cache_got_blocked = false;
+    bool ret = true;
 
     LSQRequest *request = dynamic_cast<LSQRequest*>(data_pkt->senderState);
 
     if (!lsq->cacheBlocked() &&
         lsq->cachePortAvailable(isLoad)) {
-        if (!dcachePort->sendTimingReq(data_pkt)) {
-            ret = false;
-            cache_got_blocked = true;
-        }
+	    if (!prefetch) {
+        	if (!(dcachePort->sendTimingReq(data_pkt))) {
+		    ret = false;
+        	    cache_got_blocked = true;
+        	}
+	    } else {
+        	if (!(dcachePort_b1->sendTimingReq(data_pkt))) {
+		    ret = false;
+        	    cache_got_blocked = true;
+        	}
+	    }
     } else {
         ret = false;
     }
@@ -1593,7 +1607,13 @@ LSQUnit::read(LSQRequest *request, ssize_t load_idx)
 
     // if we the cache is not blocked, do cache access
     request->buildPackets();
-    request->sendPacketToCache();
+
+    if (load_inst->isDataPrefetch()) {
+	request->sendPacketToB1Cache();
+    } else {
+	request->sendPacketToCache();
+    }
+
     if (!request->isSent())
         iewStage->blockMemInst(load_inst);
 

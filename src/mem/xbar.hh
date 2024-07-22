@@ -164,6 +164,10 @@ class BaseXBar : public ClockedObject
          */
         void recvRetry();
 
+	void releaseLayer_public() {
+		releaseLayer();
+	}
+
       protected:
 
         /**

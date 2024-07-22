@@ -1111,6 +1111,7 @@ class TraceCPU : public ClockedObject
 
     /** Used to get a reference to the dcache port. */
     Port &getDataPort() { return dcachePort; }
+    Port &getDataPortB1() { return dcachePort; }
 
     /**
      * Get a port on this CPU. All CPUs have a data and

@@ -459,6 +459,8 @@ BaseCPU::getPort(const std::string &if_name, PortID idx)
     // of getDataPort and getInstPort.
     if (if_name == "dcache_port")
         return getDataPort();
+    else if (if_name == "dcache_port_b1")
+        return getDataPortB1();
     else if (if_name == "icache_port")
         return getInstPort();
     else if (if_name == "model_reset")

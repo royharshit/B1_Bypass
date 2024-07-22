@@ -174,6 +174,7 @@ class BaseCPU : public ClockedObject
      * @return a reference to the data port
      */
     virtual Port &getDataPort() = 0;
+    virtual Port &getDataPortB1() = 0;
 
     /**
      * Purely virtual method that returns a reference to the instruction

@@ -1057,6 +1057,12 @@ class BaseCache : public ClockedObject
 
         const BaseCache &cache;
 
+	BaseCache *parent;
+
+        /** Average occupancy of MSHR Queue*/
+	statistics::Average avgMshrOccupancy;
+        /** Maximum occupancy of MSHR Queue*/
+        statistics::Scalar maxMshrOccupancy;
         /** Number of hits for demand accesses. */
         statistics::Formula demandHits;
         /** Number of hit for all accesses. */

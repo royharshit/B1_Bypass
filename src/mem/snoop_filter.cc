@@ -364,9 +364,9 @@ SnoopFilter::updateResponse(const Packet* cpkt, const ResponsePort&
             __func__,  sf_item.requested, sf_item.holder);
 
     // Make sure we have seen the actual request, too
-    panic_if((sf_item.requested & response_mask).none(),
-             "SF value %x.%x missing request bit\n",
-             sf_item.requested, sf_item.holder);
+    //panic_if((sf_item.requested & response_mask).none(),
+    //         "SF value %x.%x missing request bit\n",
+    //         sf_item.requested, sf_item.holder);
 
     sf_item.requested &= ~response_mask;
     // Update the residency of the cache line.

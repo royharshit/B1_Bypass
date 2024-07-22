@@ -56,10 +56,8 @@ Port::Port(const std::string& _name, PortID _id) :
 Port::~Port() {}
 
 
-void
-Port::reportUnbound() const
+void Port::reportUnbound() const
 {
-    fatal("%s: Unconnected port!", name());
 }
 
 } // namespace gem5

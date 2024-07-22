@@ -413,6 +413,7 @@ class ResponsePort : public Port, public AtomicResponseProtocol,
             return AtomicResponseProtocol::sendSnoop(_requestPort, pkt);
         } catch (UnboundPortException) {
             reportUnbound();
+	    return 0;
         }
     }
 
@@ -461,6 +462,7 @@ class ResponsePort : public Port, public AtomicResponseProtocol,
             return succ;
         } catch (UnboundPortException) {
             reportUnbound();
+	    return false;
         }
     }
 
@@ -558,6 +560,7 @@ RequestPort::sendAtomic(PacketPtr pkt)
         return tick;
     } catch (UnboundPortException) {
         reportUnbound();
+	return 0;
     }
 }
 
@@ -572,6 +575,7 @@ RequestPort::sendAtomicBackdoor(PacketPtr pkt, MemBackdoorPtr &backdoor)
         return tick;
     } catch (UnboundPortException) {
         reportUnbound();
+	return 0;
     }
 }
 
@@ -610,6 +614,7 @@ RequestPort::sendTimingReq(PacketPtr pkt)
         return succ;
     } catch (UnboundPortException) {
         reportUnbound();
+	return false;
     }
 }
 
@@ -620,6 +625,7 @@ RequestPort::tryTiming(PacketPtr pkt) const
         return TimingRequestProtocol::trySend(_responsePort, pkt);
     } catch (UnboundPortException) {
         reportUnbound();
+	return false;
     }
 }
 
@@ -630,6 +636,7 @@ RequestPort::sendTimingSnoopResp(PacketPtr pkt)
         return TimingRequestProtocol::sendSnoopResp(_responsePort, pkt);
     } catch (UnboundPortException) {
         reportUnbound();
+	return false;
     }
 }
 

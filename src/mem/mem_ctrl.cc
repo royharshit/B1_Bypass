@@ -280,6 +280,10 @@ MemCtrl::addToReadQueue(PacketPtr pkt,
 
             // Update stats
             stats.avgRdQLen = totalReadQueueSize + respQueue.size();
+            
+	    if (totalReadQueueSize + respQueue.size() > stats.maxRdQLen.value()) {
+		stats.maxRdQLen = totalReadQueueSize + respQueue.size();
+	    }
         }
 
         // Starting address of next memory pkt (aligned to burst boundary)
@@ -1184,6 +1188,8 @@ MemCtrl::CtrlStats::CtrlStats(MemCtrl &_ctrl)
 
     ADD_STAT(readReqs, statistics::units::Count::get(),
              "Number of read requests accepted"),
+    ADD_STAT(maxRdQLen, statistics::units::Count::get(),
+             "Maximum read queue length"),
     ADD_STAT(writeReqs, statistics::units::Count::get(),
              "Number of write requests accepted"),
 
@@ -1284,6 +1290,7 @@ MemCtrl::CtrlStats::regStats()
     const auto max_requestors = ctrl.system()->maxRequestors();
 
     avgRdQLen.precision(2);
+    maxRdQLen.precision(2);
     avgWrQLen.precision(2);
 
     readPktSize.init(ceilLog2(ctrl.system()->cacheLineSize()) + 1);

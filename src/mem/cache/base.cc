@@ -2212,8 +2212,12 @@ BaseCache::CacheCmdStats::regStatsFromParent()
 }
 
 BaseCache::CacheStats::CacheStats(BaseCache &c)
-    : statistics::Group(&c), cache(c),
+    : statistics::Group(&c), cache(c), parent(&c),
 
+    ADD_STAT(maxMshrOccupancy, statistics::units::Count::get(),
+                    "maximum number of MSHRs occupancy"),
+    ADD_STAT(avgMshrOccupancy, statistics::units::Count::get(),
+                    "number of MSHRs occupancy"),
     ADD_STAT(demandHits, statistics::units::Count::get(),
              "number of demand (read+write) hits"),
     ADD_STAT(overallHits, statistics::units::Count::get(),
@@ -2317,8 +2321,17 @@ BaseCache::CacheStats::regStats()
 
 // should writebacks be included here?  prior code was inconsistent...
 #define SUM_NON_DEMAND(s)                                       \
-    (cmd[MemCmd::SoftPFReq]->s + cmd[MemCmd::HardPFReq]->s +    \
-     cmd[MemCmd::SoftPFExReq]->s)
+	(cmd[MemCmd::SoftPFReq]->s + cmd[MemCmd::HardPFReq]->s +    \
+	 cmd[MemCmd::SoftPFExReq]->s)
+
+    maxMshrOccupancy.flags(none);
+    maxMshrOccupancy = parent->mshrQueue.getAllocated();
+    maxMshrOccupancy.name();
+
+    avgMshrOccupancy.flags(none);
+    avgMshrOccupancy = parent->mshrQueue.getAllocated();
+    avgMshrOccupancy.name();
+
 
     demandHits.flags(total | nozero | nonan);
     demandHits = SUM_DEMAND(hits);

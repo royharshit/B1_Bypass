@@ -579,7 +579,10 @@ class MemCtrl : public qos::MemCtrl
         statistics::Average avgRdQLen;
         statistics::Average avgWrQLen;
 
-        statistics::Scalar numRdRetry;
+        // Max Queue lengths
+        statistics::Scalar maxRdQLen;
+	
+	statistics::Scalar numRdRetry;
         statistics::Scalar numWrRetry;
         statistics::Vector readPktSize;
         statistics::Vector writePktSize;

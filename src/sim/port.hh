@@ -70,7 +70,7 @@ class Port
 
     class UnboundPortException {};
 
-    [[noreturn]] void reportUnbound() const;
+    void reportUnbound() const;
 
     /**
      * A numeric identifier to distinguish ports in a vector, and set

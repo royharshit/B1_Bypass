@@ -419,6 +419,7 @@ class LSQ
         /** @} */
         virtual bool recvTimingResp(PacketPtr pkt) = 0;
         virtual void sendPacketToCache() = 0;
+        virtual void sendPacketToB1Cache() = 0;
         virtual void buildPackets() = 0;
 
         /**
@@ -583,6 +584,7 @@ class LSQ
                 gem5::ThreadContext* tc, BaseMMU::Mode mode);
         virtual bool recvTimingResp(PacketPtr pkt);
         virtual void sendPacketToCache();
+        virtual void sendPacketToB1Cache();
         virtual void buildPackets();
         virtual Cycles handleLocalAccess(
                 gem5::ThreadContext *thread, PacketPtr pkt);
@@ -649,6 +651,7 @@ class LSQ
         virtual bool recvTimingResp(PacketPtr pkt);
         virtual void initiateTranslation();
         virtual void sendPacketToCache();
+        virtual void sendPacketToB1Cache();
         virtual void buildPackets();
 
         virtual Cycles handleLocalAccess(
@@ -890,6 +893,7 @@ class LSQ
     void cachePortBusy(bool is_load);
 
     RequestPort &getDataPort() { return dcachePort; }
+    RequestPort &getDataPortB1() { return dcachePort_b1; }
 
   protected:
     /** D-cache is blocked */
@@ -950,6 +954,9 @@ class LSQ
 
     /** Data port. */
     DcachePort dcachePort;
+
+    /**Data port for bypass cache*/
+    DcachePort dcachePort_b1;
 
     /** The LSQ units for individual threads. */
     std::vector<LSQUnit> thread;

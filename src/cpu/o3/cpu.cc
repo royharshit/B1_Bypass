@@ -338,6 +338,10 @@ CPU::regProbePoints()
 
 CPU::CPUStats::CPUStats(CPU *cpu)
     : statistics::Group(cpu),
+      ADD_STAT(avgROBOccupancy, statistics::units::Count::get(),
+                      "avg ROB Occupancy"),
+      ADD_STAT(maxROBOccupancy, statistics::units::Count::get(),
+                      "max ROB Occupancy"),
       ADD_STAT(timesIdled, statistics::units::Count::get(),
                "Number of times that the entire CPU went into an idle state "
                "and unscheduled itself"),
@@ -349,6 +353,10 @@ CPU::CPUStats::CPUStats(CPU *cpu)
                "for an interrupt")
 {
     // Register any of the O3CPU's stats here.
+    avgROBOccupancy
+        .prereq(avgROBOccupancy);
+    maxROBOccupancy
+        .prereq(maxROBOccupancy);
     timesIdled
         .prereq(timesIdled);
 
@@ -1132,6 +1140,13 @@ CPU::squashFromTC(ThreadID tid)
 CPU::ListIt
 CPU::addInst(const DynInstPtr &inst)
 {
+
+    cpuStats.avgROBOccupancy = rob.numInstsInROB;
+
+    if ( rob.numInstsInROB > cpuStats.maxROBOccupancy.value() ) {
+            cpuStats.maxROBOccupancy = rob.numInstsInROB;
+    }
+
     instList.push_back(inst);
 
     return --(instList.end());

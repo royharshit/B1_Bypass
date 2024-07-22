@@ -231,6 +231,9 @@ class LSQUnit
     /** Sets the pointer to the dcache port. */
     void setDcachePort(RequestPort *dcache_port);
 
+    /** Sets the pointer to the dcache port. */
+    void setDcachePortB1(RequestPort *dcache_port);
+
     /** Perform sanity checks after a drain. */
     void drainSanityCheck() const;
 
@@ -383,7 +386,7 @@ class LSQUnit
      * Check if there are ports available. Return true if
      * there are, false if there are not.
      */
-    bool trySendPacket(bool isLoad, PacketPtr data_pkt);
+    bool trySendPacket(bool isLoad, PacketPtr data_pkt, bool prefetch);
 
 
     /** Debugging function to dump instructions in the LSQ. */
@@ -406,6 +409,9 @@ class LSQUnit
 
     /** Pointer to the dcache port.  Used only for sending. */
     RequestPort *dcachePort;
+
+    /** Pointer to the dcache port.  Used only for sending. */
+    RequestPort *dcachePort_b1;
 
     /** Writeback event, specifically for when stores forward data to loads. */
     class WritebackEvent : public Event

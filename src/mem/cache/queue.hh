@@ -157,6 +157,11 @@ class Queue : public Drainable, public Named
         return _numInService;
     }
 
+    int getAllocated()
+    {
+	    return allocated;
+    }
+
     /**
      * Find the first entry that matches the provided address.
      *

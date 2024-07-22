@@ -110,6 +110,15 @@ class CheckerCPU : public BaseCPU, public ExecContext
     }
 
     Port &
+    getDataPortB1() override
+    {
+        // the checker does not have ports on its own so return the
+        // data port of the actual CPU core
+        assert(dcachePort);
+        return *dcachePort;
+    }
+
+    Port &
     getInstPort() override
     {
         // the checker does not have ports on its own so return the

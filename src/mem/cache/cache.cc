@@ -162,6 +162,14 @@ Cache::access(PacketPtr pkt, CacheBlk *&blk, Cycles &lat,
               PacketList &writebacks)
 {
 
+stats.avgMshrOccupancy = mshrQueue.getAllocated();
+
+    int mlp = mshrQueue.getAllocated();
+    if (mlp > stats.maxMshrOccupancy.value()) {
+        stats.maxMshrOccupancy = mlp;
+    }
+
+
     if (pkt->req->isUncacheable()) {
         assert(pkt->isRequest());
 

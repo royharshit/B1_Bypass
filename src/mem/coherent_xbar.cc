@@ -230,6 +230,17 @@ CoherentXBar::recvTimingReq(PacketPtr pkt, PortID cpu_side_port_id)
                     __func__, src_port->name(), pkt->print(),
                     sf_res.first.size(), sf_res.second);
 
+	    if (!sf_res.first.empty() & (pkt->cmd == MemCmd::SoftPFReq) & !pkt->fromCache()) {
+		DPRINTF(CoherentXBar, "%s: Already present in cache %s\n", __func__, pkt->print());
+		const Addr addr(pkt->getAddr());
+		snoopFilter->finishRequest(false, addr, pkt->isSecure());
+		reqLayers[mem_side_port_id]->releaseLayer_public();
+                pkt->makeResponse();
+                Tick response_time = clockEdge() + pkt->headerDelay;
+                cpuSidePorts[cpu_side_port_id]->schedTimingResp(pkt, response_time);
+		return true;
+	    }
+
             if (pkt->isEviction()) {
                 // for block-evicting packets, i.e. writebacks and
                 // clean evictions, there is no need to snoop up, as
@@ -712,8 +723,7 @@ CoherentXBar::forwardTiming(PacketPtr pkt, PortID exclude_cpu_side_port_id,
         // (corresponding to our own CPU-side port that is also in
         // snoopPorts) and should not send it back to where it came
         // from
-        if (exclude_cpu_side_port_id == InvalidPortID ||
-            p->getId() != exclude_cpu_side_port_id) {
+        if (p->getId() != exclude_cpu_side_port_id) {
             // cache is not allowed to refuse snoop
             p->sendTimingSnoopReq(pkt);
             fanout++;
