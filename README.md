@@ -7,3 +7,4 @@ Repo: git clone https://github.com/royharshit/b1_instruction.git b1_instruction 
 2. Added Avg. and Max ROB Occupancy
 3. Added Avg. and Max MSHR Occupancy
 4. If the req = Data Prefetch, send the packet through B1 port
+
